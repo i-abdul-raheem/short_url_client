@@ -7,6 +7,18 @@ const BASE_URL = 'https://short-url-api-two.vercel.app';
 export const Form = () => {
   const [msg, setMsg] = useState('');
   const [status, setStatus] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopied(true);
+      })
+      .catch(() => {
+        setCopied(false);
+      });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -23,6 +35,7 @@ export const Form = () => {
     if (req?.status === 201) {
       setStatus(true);
       setMsg(req.data);
+      copyToClipboard(`${BASE_URL}/${req.data}`);
       e.target.reset();
     } else {
       setStatus(false);
@@ -68,6 +81,13 @@ export const Form = () => {
             ) : (
               <>{msg}</>
             )}
+            &nbsp;&nbsp;&nbsp;
+            <span
+              className='font-semibold text-white'
+              onClick={copied ? null : copyToClipboard(`${BASE_URL}/${msg}`)}
+            >
+              {status && copied ? 'Copied to clipboard' : 'Copy'}
+            </span>
           </p>
         </div>
       )}
